@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Buku Kas — Catatan Keuangan Pribadi</title>
+<script>document.documentElement.dataset.theme=localStorage.getItem('bk_theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light')</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="device" id="dev">
+<canvas id="bg" aria-hidden="true"></canvas>
+<header class="top">
+  <div class="brand"><span class="logo">Rp</span><div><h1>Buku Kas</h1><p>Catatan keuangan pribadi</p></div></div>
+  <div class="notch"><nav id="nav" aria-label="Menu utama"><button data-go="home"><i>🏠</i><span>Beranda</span></button><button data-go="tx"><i>🧾</i><span>Transaksi</span></button><button data-go="wallet"><i>👛</i><span>Dompet</span></button><button data-go="stat"><i>📊</i><span>Analitik</span></button><button data-go="plan"><i>🎯</i><span>Rencana</span></button></nav></div>
+  <div class="tools">
+    <button id="srch" class="ghost icon" aria-label="Cari transaksi" title="Cari transaksi">🔍</button>
+    <button id="theme" class="ghost icon" aria-label="Ganti tema" title="Ganti tema (T)">🎨</button>
+    <button id="guide" class="ghost icon" aria-label="Panduan" title="Panduan (?)">?</button>
+    <button id="cfg" class="ghost icon" aria-label="Pengaturan" title="Pengaturan">⚙</button>
+    <button id="av" class="av" aria-label="Profil dan pengaturan">B</button>
+  </div>
+</header>
+
+<main>
+  <div class="subbar"><h2 id="vt">Beranda</h2><div class="mnav"><button id="prev" aria-label="Bulan lalu" title="Bulan lalu (←)">‹</button><strong id="mlabel"></strong><button id="next" aria-label="Bulan depan" title="Bulan depan (→)">›</button></div></div>
+  <section data-view="home" class="quick" id="quick">
+    <button class="x" id="qx" aria-label="Tutup">×</button>
+    <h2>Mulai dalam 3 langkah</h2>
+    <ol><li><b>Tulis</b> transaksi di baris paling atas tabel</li><li><b>Tekan Enter</b> — kategori ditebak otomatis dari tulisanmu</li><li><b>Lihat hasilnya</b> di kartu, grafik, dan Export Excel</li></ol>
+  </section>
+  <section class="stats" id="stats" hidden></section>
+  <div class="hgrid" data-view="home">
+    <div class="col">
+      <article class="card o1"><div id="tb" class="tbx"></div></article>
+      <article class="card wc o3" id="wcard"></article>
+      <article class="card o4"><div class="card-h"><h2>Dompet saya</h2><button class="ghost sm" data-go="wallet">+ Tambah</button></div><ul class="lst" id="acc"></ul><button class="link" data-go="wallet"><span>Lihat semua dompet</span><span>›</span></button></article>
+    </div>
+    <div class="col">
+      <article class="card o5"><div class="card-h"><h2>Ikhtisar</h2><span class="pm" id="pm"></span></div><div class="pills" id="pills"></div><div id="ov" class="ovw"></div></article>
+      <article class="card o6"><div class="card-h"><h2>Transaksi terbaru</h2><button class="ghost sm" data-go="tx">Lihat semua</button></div><ul class="lst" id="recent"></ul></article>
+    </div>
+    <div class="col">
+      <article class="card dark o2" id="qa"><div class="qah"><h2>Aksi cepat</h2><button data-q="tx" class="plusb" aria-label="Catat transaksi">+</button></div><div class="qa"><button data-q="tx"><i>✍️</i>Catat</button><button data-q="wal"><i>👛</i>Dompet</button><button data-q="goal"><i>🎯</i>Target</button><button data-q="xl"><i>📊</i>Excel</button></div></article>
+      <article class="card o7"><div class="card-h"><h2>Peta pengeluaran</h2></div>
+        <div class="donut-w"><div class="donut" id="donut"><span id="dtot"></span></div><ul class="legend" id="legend"></ul></div>
+      </article><article class="card o8"><div class="card-h"><h2>Aktivitas terbaru</h2></div><ul class="lst" id="act"></ul></article>
+    </div>
+  </div>
+  <section data-view="tx"><article class="card ledger">
+      <div class="card-h"><h2>Jurnal transaksi</h2><input id="q" type="search" placeholder="Cari…  (tekan / )"></div>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Tanggal</th><th>Keterangan</th><th class="r">Jumlah (Rp)</th><th>Kategori</th><th></th></tr></thead>
+          <tbody id="newrow">
+            <tr class="new">
+              <td><input type="date" id="nd"></td>
+              <td><input id="nx" placeholder="mis. gaji, makan siang, listrik…"></td>
+              <td><input id="na" type="number" min="0" inputmode="numeric" placeholder="0" class="r"></td>
+              <td><select id="nc"></select></td>
+              <td><button id="add" class="plus" aria-label="Tambah">+</button></td>
+            </tr>
+          </tbody>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <p class="hint" id="hint">Isi baris berwarna di atas, lalu tekan <kbd>Enter</kbd>.</p>
+      <p class="foot" id="count"></p>
+    </article></section>
+  <section class="cols" data-view="wallet">
+    <article class="card wc" id="wtot"></article>
+    <article class="card"><div class="card-h"><h2>Tambah cepat</h2></div><div id="wchips" class="chips"></div><p class="hint">Pilih dompet/rekening, lalu isi saldonya sekarang. Ubah angkanya kapan saja di daftar bawah.</p></article>
+    <article class="card wide"><div class="card-h"><h2>Dompet, rekening & e-wallet</h2></div><div id="wlist"></div></article>
+  </section>
+  <section class="cols" data-view="stat"><article class="card"><div class="card-h"><h2>Tren 6 bulan</h2></div><div id="trend"></div></article><article class="card"><div class="card-h"><h2>Wawasan bulan ini</h2></div><ul class="tips" id="tips"></ul></article><article class="card"><div class="card-h"><h2>Aturan 50/30/20</h2></div><div id="rule"></div></article><article class="card"><div class="card-h"><h2>Rasio tabungan</h2></div><div id="gauge"></div></article></section>
+  <section class="cols" data-view="plan"><article class="card"><div class="card-h"><h2>Anggaran bulanan</h2></div><div id="budgets"></div></article><article class="card"><div class="card-h"><h2>Target tabungan</h2><button id="gadd" class="ghost sm">+ Target</button></div><div id="goals"></div></article><article class="card"><div class="card-h"><h2>Anggaran teratas</h2><button class="ghost sm" data-go="plan">Atur</button></div><div class="rings" id="rings"></div></article></section>
+</main>
+<footer class="dock" id="dock" data-view="home"></footer>
+</div>
+
+<dialog id="gd">
+  <form method="dialog" class="gh"><h2>Panduan Buku Kas</h2><button aria-label="Tutup">×</button></form>
+  <div class="gb">
+    <h3>🚀 Mulai cepat</h3>
+    <ol><li>Isi <b>baris berwarna</b> paling atas tabel: tanggal, keterangan, jumlah.</li><li>Kategori <b>dipilih otomatis</b> dari keterangan (mis. “gaji”, “listrik”, “kopi”) — bisa diubah manual.</li><li>Tekan <kbd>Enter</kbd> atau tombol <b>+</b>. Selesai, data langsung tersimpan.</li></ol>
+    <h3>📱 Menu</h3><p><b>Beranda</b> (ringkasan), <b>Transaksi</b> (jurnal), <b>Dompet</b> (saldo bank/e-wallet), <b>Analitik</b> (grafik & wawasan), <b>Rencana</b> (anggaran & target). Di HP menunya ada di bawah layar. Tombol angka <kbd>1</kbd>–<kbd>5</kbd> pindah menu.</p><h3>👛 Dompet & e-wallet</h3><p>Pilih DANA, GoPay, OVO, BCA, dll., lalu isi saldo saat ini. Saldo <b>diisi manual</b> (aplikasi tidak terhubung ke bank demi privasi); ubah angkanya kapan saja saat saldomu berubah.</p><h3>🧭 Arti tiap bagian</h3>
+    <dl><dt>Saldo / Pemasukan / Pengeluaran</dt><dd>Ringkasan bulan yang sedang dipilih (ganti dengan ‹ ›).</dd>
+    <dt>Peta pengeluaran & Tren 6 bulan</dt><dd>Ke mana uangmu pergi, dan apakah bulan ini lebih boros dari biasanya.</dd>
+    <dt>Aturan 50/30/20</dt><dd>Patokan sehat: 50% kebutuhan, 30% keinginan, 20% tabungan. Garis hitam = target.</dd>
+    <dt>Anggaran bulanan</dt><dd>Ketik batas belanja per kategori. Bar menjadi merah jika melebihi.</dd>
+    <dt>Target tabungan</dt><dd>Buat tujuan (mis. “Laptop”, Rp 10 juta), lalu klik <b>+ Setor</b> setiap menabung.</dd></dl>
+    <h3>🎨 Tampilan</h3>
+    <p>Tombol 🎨 berganti tema satu per satu; di ⚙ Pengaturan kamu bisa memilih 7 tema (Krem, Mint, Lavender, Samudra, Senja, Hutan Malam, Midnight) dan mengatur latar dinamis: titik jatuh, cahaya mouse, keduanya, atau mati (hemat baterai).</p>
+    <h3>📊 Export Excel</h3>
+    <p>Menghasilkan 4 sheet rapi: <b>Ringkasan</b> (KPI + 2 grafik), <b>Transaksi</b> (siap filter), <b>Anggaran</b> (grafik realisasi vs anggaran), <b>Dompet</b> (saldo + target tabungan + grafik). Rumusnya hidup, jadi bisa kamu edit di Excel.</p>
+    <h3>⌨️ Pintasan keyboard</h3>
+    <p><kbd>Enter</kbd> tambah · <kbd>/</kbd> cari · <kbd>←</kbd> <kbd>→</kbd> ganti bulan · <kbd>T</kbd> ganti tema · <kbd>?</kbd> buka panduan</p>
+    <h3>💾 Data & keamanan</h3>
+    <p>Data hanya tersimpan di browser ini (tidak dikirim ke mana pun). Pindah perangkat atau bersih-bersih browser? Klik <b>Backup</b> dulu, lalu <b>Restore</b> di tempat baru.</p>
+  </div>
+</dialog>
+<dialog id="sd">
+  <form method="dialog" class="gh"><h2>Pengaturan</h2><button aria-label="Tutup">×</button></form>
+  <div class="gb">
+    <h3>🎨 Tema warna</h3><div id="sw" class="sws"></div>
+    <h3>✦ Latar dinamis</h3><label class="sel" title="Efek latar belakang">✦ <select id="fxm" aria-label="Latar dinamis"><option value="both">Titik + cahaya</option><option value="dots">Titik jatuh</option><option value="light">Cahaya mouse</option><option value="off">Latar: mati</option></select></label>
+    <h3>👤 Nama panggilan</h3><input id="nm" placeholder="Nama kamu (untuk sapaan di Beranda)" style="border-color:var(--line)">
+    <h3>💾 Data</h3><div class="row"><button id="backup" class="ghost">Backup</button><label class="ghost">Restore<input type="file" id="restore" accept=".json" hidden></label><button id="xlsx" class="solid">Export Excel ↓</button></div>
+    <h3>❓ Bantuan</h3><button class="ghost" id="g2">Buka panduan</button>
+  </div>
+</dialog>
+<div id="toast" role="status"></div>
+
+<script src="js/xlsx.js"></script>
+<script src="js/app.js"></script>
+<script src="js/bg.js"></script>
+<script src="js/report.js"></script>
+<script src="js/extra.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>
